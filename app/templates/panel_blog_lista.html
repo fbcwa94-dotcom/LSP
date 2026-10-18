@@ -27,9 +27,6 @@
   .acciones { display:flex; gap:.4rem; flex-wrap:nowrap; align-items:center; }
   .acciones form { margin:0; }
   .acciones .btn { padding:.4rem .95rem; font-size:.78rem; line-height:1.2; white-space:nowrap; }
-  .filtro select { font:inherit; font-size:.85rem; padding:.5rem 1rem; border:1px solid var(--borde); border-radius:999px; background:#fff; }
-  .landing-tag { display:inline-block; padding:.15rem .7rem; border-radius:999px; font-size:.75rem; font-weight:600; background:#EFEDE4; }
-  .landing-tag.sin { background:#FBE4E2; color:#B3261E; }
   .barra { display:flex; gap:.6rem; align-items:center; flex-wrap:wrap; }
   .vacio { padding:3rem 1rem; text-align:center; color:var(--gris); }
   </style>
@@ -37,12 +34,6 @@
   <div class="encabezado">
     <h2>Artículos del blog</h2>
     <div class="barra">
-      <form method="get" class="filtro">
-        <select name="landing" onchange="this.form.submit()" aria-label="Filtrar por landing">
-          <option value="">Todas las landings</option>
-          {% for l in landings %}<option value="{{ l.slug }}" {% if l.slug == landing_sel %}selected{% endif %}>{{ l.nombre }}</option>{% endfor %}
-        </select>
-      </form>
       <a class="btn" href="{% url 'panel_blog_nuevo' %}">+ Nuevo artículo</a>
     </div>
   </div>
@@ -51,7 +42,7 @@
     {% if posts %}
       <table>
         <thead>
-          <tr><th>Artículo</th><th>Landing</th><th>Estado</th><th>Publicado</th><th>Autor</th><th>Acciones</th></tr>
+          <tr><th>Artículo</th><th>Estado</th><th>Publicado</th><th>Autor</th><th>Acciones</th></tr>
         </thead>
         <tbody>
           {% for p in posts %}
@@ -66,7 +57,6 @@
                   </div>
                 </div>
               </td>
-              <td class="fijo">{% if p.landing %}<span class="landing-tag">{{ p.landing.nombre }}</span>{% else %}<span class="landing-tag sin">Sin landing</span>{% endif %}</td>
               <td class="fijo"><span class="estado {% if p.publicado %}pub{% else %}bor{% endif %}">{% if p.publicado %}Publicado{% else %}Borrador{% endif %}</span></td>
               <td class="fijo">{{ p.fecha_publicacion|date:"d/m/Y"|default:"—" }}</td>
               <td class="fijo">{{ p.autor.get_username|default:"—" }}</td>

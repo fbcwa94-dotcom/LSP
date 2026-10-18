@@ -9,11 +9,10 @@ class LeadForm(forms.ModelForm):
         fields = ["nombre", "cargo", "empresa", "correo", "celular", "mensaje"]
 
 
-
 class PostForm(forms.ModelForm):
     class Meta:
         model = Post
-        fields = ["landing", "titulo", "resumen", "portada", "contenido", "publicado"]
+        fields = ["titulo", "resumen", "portada", "contenido", "publicado"]
 
     def clean_portada(self):
         portada = self.cleaned_data.get("portada")

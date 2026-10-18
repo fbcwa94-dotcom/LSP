@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block titulo %}Blog | {{ landing.nombre }}{% endblock %}</title>
+  <title>{% block titulo %}Blog | SL Producciones{% endblock %}</title>
   {% block meta %}<meta name="description" content="Ideas, tendencias y consejos para fiestas de fin de año y eventos corporativos.">{% endblock %}
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -36,17 +36,17 @@
   <header class="cab">
     <div class="cont">
       <!-- ▼▼▼ IMAGEN: LOGO (reemplaza este texto por <img src="{% static 'img/logo-sl.png' %}" alt="SL Producciones"> cuando lo tengas) ▼▼▼ -->
-      <a class="logo" href="{{ landing.get_absolute_url }}">{{ landing.nombre }}</a>
+      <a class="logo" href="{% url 'landing' %}">SL <span>Producciones</span></a>
       <nav aria-label="Principal">
-        <a href="{{ landing.get_absolute_url }}">Inicio</a>
-        <a href="{% url 'blog_lista' landing.slug %}">Blog</a>
-        <a class="btn" href="{{ landing.get_absolute_url }}#contacto">Hablemos de tu evento</a>
+        <a href="{% url 'landing' %}">Inicio</a>
+        <a href="{% url 'blog_lista' %}">Blog</a>
+        <a class="btn" href="{% url 'landing' %}#contacto">Hablemos de tu evento</a>
       </nav>
     </div>
   </header>
 
   <main>{% block contenido %}{% endblock %}</main>
 
-  <footer class="pie">© {{ landing.nombre }}</footer>
+  <footer class="pie">© SL Producciones · Fiestas de fin de año y eventos corporativos en Colombia</footer>
 </body>
 </html>

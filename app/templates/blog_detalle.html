@@ -1,5 +1,5 @@
 {% extends "blog_base.html" %}
-{% block titulo %}{{ post.titulo }} | Blog {{ post.landing.nombre }}{% endblock %}
+{% block titulo %}{{ post.titulo }} | Blog SL Producciones{% endblock %}
 {% block meta %}
   <meta name="description" content="{{ post.resumen }}">
   <meta property="og:title" content="{{ post.titulo }}">
@@ -37,7 +37,7 @@
   {% if not post.publicado %}<div class="borrador">Borrador: solo tú puedes ver este artículo. Aún no está publicado.</div>{% endif %}
 
   <article class="articulo">
-    <a class="volver" href="{% url 'blog_lista' post.landing.slug %}">← Volver al blog</a>
+    <a class="volver" href="{% url 'blog_lista' %}">← Volver al blog</a>
     <h1>{{ post.titulo }}</h1>
     <p class="meta">
       {% if post.fecha_publicacion %}{{ post.fecha_publicacion|date:"j \d\e F \d\e Y" }}{% else %}Sin publicar{% endif %}
@@ -53,7 +53,7 @@
 
     <aside class="cta">
       <h2>¿Listo para tu próxima celebración?</h2>
-      <a class="btn" href="{{ landing.get_absolute_url }}#contacto">Cuéntanos qué quieres celebrar</a>
+      <a class="btn" href="{% url 'landing' %}#contacto">Cuéntanos qué quieres celebrar</a>
     </aside>
   </article>
 {% endblock %}

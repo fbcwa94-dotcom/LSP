@@ -35,13 +35,6 @@
     {{ form.non_field_errors }}
 
     <div class="campo">
-      <label for="{{ form.landing.id_for_label }}">Landing</label>
-      {{ form.landing }}
-      <p class="ayuda">Define en qué landing se publica este artículo. Solo aparecerá en el blog de esa landing.</p>
-      {% for e in form.landing.errors %}<p class="error">{{ e }}</p>{% endfor %}
-    </div>
-
-    <div class="campo">
       <label for="{{ form.titulo.id_for_label }}">Título</label>
       {{ form.titulo }}
       {% for e in form.titulo.errors %}<p class="error">{{ e }}</p>{% endfor %}

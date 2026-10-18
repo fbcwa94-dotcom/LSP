@@ -1,181 +1,90 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Panel de registros</title>
+{% extends "panel_base.html" %}
+{% block titulo %}Registros | Panel{% endblock %}
+{% block nav_leads %}activa{% endblock %}
+{% block contenido %}
   <style>
-    :root {
-      --amarillo: #FFC20E;
-      --negro: #1E1E1E;
-      --crema: #F4F3EE;
-      --gris: #6B6B6B;
-      --borde: #DEDBD2;
-    }
-    *, *::before, *::after { box-sizing: border-box; }
-    body { margin: 0; font-family: "Poppins", Arial, sans-serif; color: var(--negro); background: var(--crema); }
-    a { color: inherit; text-decoration: none; }
+    .barra { display:flex; gap:.5rem; flex-wrap:wrap; align-items:center; }
+    .barra input, .barra select { font:inherit; font-size:.85rem; padding:.55rem .9rem; border:1px solid var(--borde); border-radius:999px; background:#fff; }
+    .barra button { font:inherit; font-size:.85rem; font-weight:600; padding:.55rem 1.2rem; border:0; border-radius:999px; background:var(--negro); color:#fff; cursor:pointer; }
+    .encabezado p { margin:.2rem 0 0; color:var(--gris); font-size:.85rem; }
 
-    .layout { display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; }
+    .tabla-wrap { overflow-x:auto; background:#fff; border:1px solid var(--borde); border-radius:14px; }
+    table { width:100%; min-width:900px; border-collapse:collapse; font-size:.85rem; }
+    th, td { padding:.8rem 1rem; text-align:left; vertical-align:top; border-bottom:1px solid var(--borde); }
+    th { font-size:.75rem; font-weight:600; color:var(--gris); background:#FAF9F5; white-space:nowrap; text-transform:uppercase; letter-spacing:.03em; }
+    tbody tr:last-child td { border-bottom:0; }
+    tbody tr:hover { background:#FCFBF7; }
+    td.fijo { white-space:nowrap; }
+    td.mensaje { min-width:240px; max-width:380px; color:#444; overflow-wrap:anywhere; }
+    td a:hover { text-decoration:underline; }
 
-    /* ---------- Lateral ---------- */
-    .lateral { background: var(--negro); color: #fff; padding: 1.5rem 1rem; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
-    .lateral h1 { font-size: 1rem; margin: 0 .5rem 1.2rem; font-weight: 600; }
-    .lateral ul { list-style: none; margin: 0; padding: 0; display: grid; gap: .25rem; }
-    .lateral a {
-      display: flex; justify-content: space-between; align-items: center; gap: .5rem;
-      padding: .65rem .8rem; border-radius: 10px; font-size: .85rem; color: #D8D8D8;
-    }
-    .lateral a:hover { background: rgba(255,255,255,.08); }
-    .lateral a.activa { background: var(--amarillo); color: var(--negro); font-weight: 600; }
-    .lateral a:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
-    .lateral .total {
-      font-size: .72rem; min-width: 1.6rem; text-align: center; padding: .1rem .5rem;
-      border-radius: 999px; background: rgba(255,255,255,.15);
-    }
-    .lateral a.activa .total { background: rgba(0,0,0,.15); }
-    .lateral .inactiva { opacity: .5; }
+    .estado { display:inline-block; padding:.15rem .7rem; border-radius:999px; font-size:.75rem; font-weight:600; background:#EEE; white-space:nowrap; }
+    .estado.nuevo { background:var(--amarillo); }
+    .estado.contactado { background:#D9E8FF; }
+    .estado.cotizado { background:#E6DCFF; }
+    .estado.cerrado { background:#CDEFD3; }
+    .estado.descartado { background:#E8E8E8; color:var(--gris); }
 
-    /* ---------- Contenido ---------- */
-    .contenido { padding: 2rem; min-width: 0; }
-    .encabezado { display: flex; justify-content: space-between; align-items: end; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.2rem; }
-    .encabezado h2 { margin: 0; font-size: 1.6rem; }
-    .encabezado p { margin: .2rem 0 0; color: var(--gris); font-size: .85rem; }
-
-    .filtros { display: flex; gap: .5rem; flex-wrap: wrap; }
-    .filtros input, .filtros select {
-      font: inherit; font-size: .85rem; padding: .55rem .9rem; border: 1px solid var(--borde);
-      border-radius: 999px; background: #fff;
-    }
-    .filtros button {
-      font: inherit; font-size: .85rem; font-weight: 600; padding: .55rem 1.2rem; border: 0;
-      border-radius: 999px; background: var(--negro); color: #fff; cursor: pointer;
-    }
-    .filtros input:focus-visible, .filtros select:focus-visible, .filtros button:focus-visible { outline: 3px solid var(--amarillo); outline-offset: 2px; }
-
-    .tabla-wrap { overflow-x: auto; background: #fff; border: 1px solid var(--borde); border-radius: 14px; }
-    table { width: 100%; border-collapse: collapse; font-size: .85rem; }
-    th, td { padding: .8rem 1rem; text-align: left; vertical-align: top; border-bottom: 1px solid var(--borde); }
-    th { font-weight: 600; font-size: .78rem; color: var(--gris); background: #FAF9F5; white-space: nowrap; }
-    tr:last-child td { border-bottom: 0; }
-    td.mensaje { min-width: 220px; max-width: 360px; color: #444; }
-    td a:hover { text-decoration: underline; }
-    .estado { display: inline-block; padding: .15rem .65rem; border-radius: 999px; font-size: .75rem; font-weight: 600; background: #EEE; white-space: nowrap; }
-    .estado.nuevo { background: var(--amarillo); }
-    .estado.contactado { background: #D9E8FF; }
-    .estado.cotizado { background: #E6DCFF; }
-    .estado.cerrado { background: #CDEFD3; }
-    .estado.descartado { background: #E8E8E8; color: var(--gris); }
-    .vacio { padding: 3rem 1rem; text-align: center; color: var(--gris); }
-
-    @media (max-width: 800px) {
-      .layout { grid-template-columns: 1fr; }
-      .lateral { position: static; height: auto; }
-      .lateral ul { grid-auto-flow: column; grid-auto-columns: max-content; overflow-x: auto; padding-bottom: .3rem; }
-      .contenido { padding: 1rem; }
-    }
-    .acciones { display: flex; gap: .5rem; flex-wrap: wrap; align-items: center; }
-.btn-csv {
-  font-size: .85rem; font-weight: 600; padding: .55rem 1.2rem; border-radius: 999px;
-  background: var(--amarillo); color: var(--negro);
-}
-.btn-csv:hover { filter: brightness(.95); }
-.btn-csv:focus-visible { outline: 3px solid var(--negro); outline-offset: 2px; }
+    .vacio { padding:3rem 1rem; text-align:center; color:var(--gris); }
+    .paginas { display:flex; justify-content:center; align-items:center; gap:1rem; margin-top:1.2rem; font-size:.85rem; font-weight:600; }
   </style>
-</head>
-<body>
-  <div class="layout">
-<nav class="lateral" aria-label="Landings">
-  <a href="{% url 'panel_blog' %}">
-              <span>Regresar</span>
 
-            </a>
-      <h1>Registros por landing</h1>
-      <ul>
-        {% for l in landings %}
-          <li>
-            <a href="{% url 'panel_landing' l.slug %}"
-               class="{% if l.pk == seleccionada.pk %}activa{% endif %} {% if not l.activa %}inactiva{% endif %}"
-               {% if l.pk == seleccionada.pk %}aria-current="page"{% endif %}>
-              <span>{{ l.nombre }}</span>
-              <span class="total">{{ l.total }}</span>
-            </a>
-          </li>
-        {% empty %}
-          <li style="padding:.8rem;font-size:.85rem;color:#aaa;">Aún no hay landings creadas.</li>
-        {% endfor %}
-      </ul>
-    </nav>
-    <!-- ============ LATERAL: lista de landings ============ -->
+  <div class="encabezado">
+    <div>
+      <h2>Registros</h2>
+      <p>{{ total }} registro{{ total|pluralize }}{% if q or estado %} con los filtros aplicados{% endif %}</p>
+    </div>
 
-    <!-- ============ CONTENIDO: tabla ============ -->
-    <main class="contenido">
-      {% if seleccionada %}
-        <div class="encabezado">
-          <div>
-            <h2>{{ seleccionada.nombre }}</h2>
-            <p>{{ leads|length }} registro{{ leads|length|pluralize }}{% if q or estado %} con los filtros aplicados{% endif %}</p>
-          </div>
-
-          <div class="acciones">
-          <form class="filtros" method="get">
-            <input type="search" name="q" value="{{ q }}" placeholder="Buscar nombre, empresa, correo…"
-              aria-label="Buscar">
-            <select name="estado" aria-label="Estado">
-              <option value="">Todos los estados</option>
-              {% for valor, etiqueta in estados %}
-              <option value="{{ valor }}" {% if valor == estado %}selected{% endif %}>{{ etiqueta }}</option>
-              {% endfor %}
-            </select>
-            <button type="submit">Filtrar</button>
-          </form>
-          
-          <a class="btn-csv" href="{% url 'panel_csv' seleccionada.slug %}?{{ request.GET.urlencode }}">
-            Descargar CSV
-          </a>
-        </div>
-        </div>
-
-        <div class="tabla-wrap">
-          {% if leads %}
-            <table>
-              <thead>
-                <tr>
-                  <th>Fecha</th>
-                  <th>Nombre</th>
-                  <th>Cargo</th>
-                  <th>Empresa</th>
-                  <th>Correo</th>
-                  <th>Celular</th>
-                  <th>Mensaje</th>
-                  <th>Estado</th>
-                  <th>Campaña</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for lead in leads %}
-                  <tr>
-                    <td>{{ lead.creado|date:"d/m/Y H:i" }}</td>
-                    <td>{{ lead.nombre }}</td>
-                    <td>{{ lead.cargo|default:"—" }}</td>
-                    <td>{{ lead.empresa }}</td>
-                    <td><a href="mailto:{{ lead.correo }}">{{ lead.correo }}</a></td>
-                    <td><a href="tel:{{ lead.celular }}">{{ lead.celular }}</a></td>
-                    <td class="mensaje">{{ lead.mensaje|default:"—" }}</td>
-                    <td><span class="estado {{ lead.estado }}">{{ lead.get_estado_display }}</span></td>
-                    <td>{{ lead.utm_campaign|default:"—" }}</td>
-                  </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          {% else %}
-            <p class="vacio">No hay registros{% if q or estado %} que coincidan con el filtro{% endif %}.</p>
-          {% endif %}
-        </div>
-      {% else %}
-        <p class="vacio">Crea una landing en el admin para empezar a ver registros.</p>
-      {% endif %}
-    </main>
+    <div class="barra">
+      <form method="get" class="barra">
+        <input type="search" name="q" value="{{ q }}" placeholder="Buscar nombre, empresa, correo…" aria-label="Buscar">
+        <select name="estado" aria-label="Estado">
+          <option value="">Todos los estados</option>
+          {% for valor, etiqueta in estados %}
+            <option value="{{ valor }}" {% if valor == estado %}selected{% endif %}>{{ etiqueta }}</option>
+          {% endfor %}
+        </select>
+        <button type="submit">Filtrar</button>
+      </form>
+      <a class="btn" href="{% url 'panel_csv' %}{% if qs %}?{{ qs }}{% endif %}">Descargar CSV</a>
+    </div>
   </div>
-</body>
-</html>
+
+  <div class="tabla-wrap">
+    {% if pagina.object_list %}
+      <table>
+        <thead>
+          <tr>
+            <th>Fecha</th><th>Nombre</th><th>Cargo</th><th>Empresa</th><th>Correo</th>
+            <th>Celular</th><th>Mensaje</th><th>Estado</th><th>Campaña</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for lead in pagina %}
+            <tr>
+              <td class="fijo">{{ lead.creado|date:"d/m/Y H:i" }}</td>
+              <td>{{ lead.nombre }}</td>
+              <td>{{ lead.cargo|default:"—" }}</td>
+              <td>{{ lead.empresa }}</td>
+              <td class="fijo"><a href="mailto:{{ lead.correo }}">{{ lead.correo }}</a></td>
+              <td class="fijo"><a href="tel:{{ lead.celular }}">{{ lead.celular }}</a></td>
+              <td class="mensaje">{{ lead.mensaje|default:"—" }}</td>
+              <td class="fijo"><span class="estado {{ lead.estado }}">{{ lead.get_estado_display }}</span></td>
+              <td class="fijo">{{ lead.utm_campaign|default:"—" }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p class="vacio">No hay registros{% if q or estado %} que coincidan con el filtro{% endif %}.</p>
+    {% endif %}
+  </div>
+
+  {% if pagina.has_other_pages %}
+    <nav class="paginas" aria-label="Paginación">
+      {% if pagina.has_previous %}<a href="?page={{ pagina.previous_page_number }}{% if qs %}&{{ qs }}{% endif %}">← Anterior</a>{% endif %}
+      <span>Página {{ pagina.number }} de {{ pagina.paginator.num_pages }}</span>
+      {% if pagina.has_next %}<a href="?page={{ pagina.next_page_number }}{% if qs %}&{{ qs }}{% endif %}">Siguiente →</a>{% endif %}
+    </nav>
+  {% endif %}
+{% endblock %}

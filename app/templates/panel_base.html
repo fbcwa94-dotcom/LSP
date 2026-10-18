@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titulo %}Panel{% endblock %}</title>
+  <style>
+    :root { --amarillo:#FFC20E; --negro:#1E1E1E; --crema:#F4F3EE; --gris:#6B6B6B; --borde:#DEDBD2; }
+    *,*::before,*::after { box-sizing:border-box; }
+    body { margin:0; font-family:"Poppins",Arial,sans-serif; color:var(--negro); background:var(--crema); }
+    a { color:inherit; text-decoration:none; }
+    .layout { display:grid; grid-template-columns:240px 1fr; min-height:100vh; }
+    .lateral { background:var(--negro); color:#fff; padding:1.5rem 1rem; position:sticky; top:0; height:100vh; }
+    .lateral h1 { font-size:1rem; margin:0 .5rem 1.2rem; }
+    .lateral ul { list-style:none; margin:0; padding:0; display:grid; gap:.25rem; }
+    .lateral a { display:block; padding:.65rem .8rem; border-radius:10px; font-size:.85rem; color:#D8D8D8; }
+    .lateral a:hover { background:rgba(255,255,255,.08); }
+    .lateral a.activa { background:var(--amarillo); color:var(--negro); font-weight:600; }
+    .lateral .salir { margin-top:1.5rem; padding:0 .5rem; }
+    .lateral .salir button { width:100%; font:inherit; font-size:.8rem; padding:.55rem 1rem; border-radius:999px; border:1px solid rgba(255,255,255,.3); background:transparent; color:#fff; cursor:pointer; }
+    .contenido { padding:2rem; min-width:0; }
+    .aviso { background:#CDEFD3; border-radius:12px; padding:.7rem 1rem; font-size:.85rem; margin-bottom:1.2rem; }
+    .encabezado { display:flex; justify-content:space-between; align-items:center; gap:1rem; flex-wrap:wrap; margin-bottom:1.2rem; }
+    .encabezado h2 { margin:0; font-size:1.6rem; }
+    .btn { display:inline-block; border:0; cursor:pointer; font:inherit; font-size:.85rem; font-weight:600; padding:.6rem 1.3rem; border-radius:999px; background:var(--amarillo); color:var(--negro); }
+    .btn.oscuro { background:var(--negro); color:#fff; }
+    .btn.peligro { background:#fff; color:#B3261E; border:1px solid #E7B9B5; }
+    a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible { outline:3px solid var(--amarillo); outline-offset:2px; }
+    @media (max-width:800px){ .layout{grid-template-columns:1fr;} .lateral{position:static;height:auto;} .contenido{padding:1rem;} }
+
+  </style>
+  {% block head %}{% endblock %}
+</head>
+<body>
+  <div class="layout">
+    <nav class="lateral" aria-label="Panel">
+      <h1>Panel</h1>
+      <ul>
+        <li><a href="{% url 'panel' %}" class="{% block nav_leads %}{% endblock %}">Registros</a></li>
+        <li><a href="{% url 'panel_blog' %}" class="{% block nav_blog %}{% endblock %}">Blog</a></li>
+      </ul>
+    </nav>
+    <main class="contenido">
+      {% for m in messages %}<p class="aviso" role="status">{{ m }}</p>{% endfor %}
+      {% block contenido %}{% endblock %}
+    </main>
+  </div>
+</body>
+</html>

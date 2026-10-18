@@ -85,9 +85,11 @@
 </head>
 <body>
   <div class="layout">
+<nav class="lateral" aria-label="Landings">
+  <a href="{% url 'panel_blog' %}">
+              <span>Regresar</span>
 
-    <!-- ============ LATERAL: lista de landings ============ -->
-    <nav class="lateral" aria-label="Landings">
+            </a>
       <h1>Registros por landing</h1>
       <ul>
         {% for l in landings %}
@@ -104,6 +106,7 @@
         {% endfor %}
       </ul>
     </nav>
+    <!-- ============ LATERAL: lista de landings ============ -->
 
     <!-- ============ CONTENIDO: tabla ============ -->
     <main class="contenido">

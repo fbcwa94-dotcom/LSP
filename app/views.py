@@ -1,15 +1,25 @@
-from django.contrib.admin.views.decorators import staff_member_required
-from django.db.models import Count, Q
-from django.shortcuts import get_object_or_404, redirect, render
-from .forms import LeadForm
-from .models import Landing, Lead
-from django.contrib import messages
-from django.http import HttpRequest, HttpResponse
 import csv
+
+from django.contrib import messages
+from django.contrib.auth.decorators import user_passes_test
+from django.core.paginator import Paginator
+from django.db.models import Count, Q
+from django.http import HttpRequest, HttpResponse
+from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
+from django.views.decorators.http import require_POST
+from django.contrib.admin.views.decorators import staff_member_required
+from .forms import LeadForm, PostForm
+from .models import Landing, Lead, Post
+
+# Solo usuarios con sesión iniciada y marcados como "staff"
+solo_staff = user_passes_test(lambda u: u.is_active and u.is_staff)
 
 
-from .models import Landing
+
+
+
+
 
 
 def landing_view(request: HttpRequest, slug: str, template: str) -> HttpResponse:
@@ -147,3 +157,55 @@ def panel_csv(request, slug):
             lead.utm_source, lead.utm_medium, lead.utm_campaign,
         )])
     return respuesta
+
+
+def blog_lista(request, landing_slug):
+    landing = get_object_or_404(Landing, slug=landing_slug, activa=True)
+    posts = Post.objects.filter(landing=landing, publicado=True)
+    pagina = Paginator(posts, 9).get_page(request.GET.get("page"))
+    return render(request, "blog_lista.html", {"landing": landing, "pagina": pagina})
+
+
+def blog_detalle(request, landing_slug, slug):
+    qs = Post.objects.select_related("landing", "autor").filter(landing__slug=landing_slug)
+    if not request.user.is_staff:
+        qs = qs.filter(publicado=True, landing__activa=True)
+    post = get_object_or_404(qs, slug=slug)
+    return render(request, "blog_detalle.html", {"post": post, "landing": post.landing})
+
+
+@solo_staff
+def panel_blog(request):
+    landing_sel = request.GET.get("landing", "")
+    posts = Post.objects.select_related("autor", "landing")
+    if landing_sel:
+        posts = posts.filter(landing__slug=landing_sel)
+    return render(request, "panel_blog_lista.html", {
+        "posts": posts,
+        "landings": Landing.objects.order_by("nombre"),
+        "landing_sel": landing_sel,
+    })
+
+
+@solo_staff
+def panel_blog_form(request, pk=None):
+    post = get_object_or_404(Post, pk=pk) if pk else None
+    form = PostForm(request.POST or None, request.FILES or None, instance=post)
+
+    if request.method == "POST" and form.is_valid():
+        nuevo = form.save(commit=False)
+        if nuevo.autor_id is None:
+            nuevo.autor = request.user
+        nuevo.save()
+        messages.success(request, "Artículo guardado.")
+        return redirect("panel_blog")
+
+    return render(request, "panel_blog_form.html", {"form": form, "post": post})
+
+
+@solo_staff
+@require_POST
+def panel_blog_eliminar(request, pk):
+    get_object_or_404(Post, pk=pk).delete()
+    messages.success(request, "Artículo eliminado.")
+    return redirect("panel_blog")

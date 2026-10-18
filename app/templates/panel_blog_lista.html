@@ -1,0 +1,90 @@
+{% extends "panel_base.html" %}
+{% block titulo %}Blog | Panel{% endblock %}
+{% block nav_blog %}activa{% endblock %}
+{% block contenido %}
+  <style>
+  .tabla-wrap { overflow-x:auto; background:#fff; border:1px solid var(--borde); border-radius:14px; }
+  table { width:100%; min-width:760px; border-collapse:collapse; font-size:.85rem; }
+  th, td { padding:.85rem 1rem; text-align:left; border-bottom:1px solid var(--borde); vertical-align:middle; }
+  th { font-size:.75rem; font-weight:600; color:var(--gris); background:#FAF9F5; white-space:nowrap; text-transform:uppercase; letter-spacing:.03em; }
+  tbody tr:last-child td { border-bottom:0; }
+  tbody tr:hover { background:#FCFBF7; }
+
+  /* Columna del título: ocupa el espacio libre y parte el texto largo */
+  td.titulo { width:100%; min-width:240px; overflow-wrap:anywhere; }
+  .titulo-fila { display:flex; align-items:center; gap:.8rem; }
+  .mini { width:56px; height:38px; border-radius:8px; background:var(--amarillo); flex-shrink:0; overflow:hidden; display:grid; place-items:center; font-weight:700; }
+  .mini img { width:100%; height:100%; object-fit:cover; }
+  .titulo-fila strong { display:block; font-weight:600; line-height:1.3; }
+  .titulo-fila small { color:var(--gris); font-size:.72rem; }
+
+  /* El resto de columnas no se parten */
+  td.fijo { white-space:nowrap; }
+  .estado { display:inline-block; padding:.15rem .7rem; border-radius:999px; font-size:.75rem; font-weight:600; }
+  .estado.pub { background:#CDEFD3; }
+  .estado.bor { background:#E8E8E8; color:var(--gris); }
+
+  .acciones { display:flex; gap:.4rem; flex-wrap:nowrap; align-items:center; }
+  .acciones form { margin:0; }
+  .acciones .btn { padding:.4rem .95rem; font-size:.78rem; line-height:1.2; white-space:nowrap; }
+  .filtro select { font:inherit; font-size:.85rem; padding:.5rem 1rem; border:1px solid var(--borde); border-radius:999px; background:#fff; }
+  .landing-tag { display:inline-block; padding:.15rem .7rem; border-radius:999px; font-size:.75rem; font-weight:600; background:#EFEDE4; }
+  .landing-tag.sin { background:#FBE4E2; color:#B3261E; }
+  .barra { display:flex; gap:.6rem; align-items:center; flex-wrap:wrap; }
+  .vacio { padding:3rem 1rem; text-align:center; color:var(--gris); }
+  </style>
+
+  <div class="encabezado">
+    <h2>Artículos del blog</h2>
+    <div class="barra">
+      <form method="get" class="filtro">
+        <select name="landing" onchange="this.form.submit()" aria-label="Filtrar por landing">
+          <option value="">Todas las landings</option>
+          {% for l in landings %}<option value="{{ l.slug }}" {% if l.slug == landing_sel %}selected{% endif %}>{{ l.nombre }}</option>{% endfor %}
+        </select>
+      </form>
+      <a class="btn" href="{% url 'panel_blog_nuevo' %}">+ Nuevo artículo</a>
+    </div>
+  </div>
+
+  <div class="tabla-wrap">
+    {% if posts %}
+      <table>
+        <thead>
+          <tr><th>Artículo</th><th>Landing</th><th>Estado</th><th>Publicado</th><th>Autor</th><th>Acciones</th></tr>
+        </thead>
+        <tbody>
+          {% for p in posts %}
+            <tr>
+              <td class="titulo">
+                <div class="titulo-fila">
+                  <!-- ▼▼▼ Miniatura de la portada (si no hay, se muestra la inicial) ▼▼▼ -->
+                  <div class="mini">{% if p.portada %}<img src="{{ p.portada.url }}" alt="" width="56" height="38">{% else %}{{ p.titulo|slice:":1" }}{% endif %}</div>
+                  <div>
+                    <strong>{{ p.titulo }}</strong>
+                    {% if p.get_absolute_url %}<small>{{ p.get_absolute_url }}</small>{% endif %}
+                  </div>
+                </div>
+              </td>
+              <td class="fijo">{% if p.landing %}<span class="landing-tag">{{ p.landing.nombre }}</span>{% else %}<span class="landing-tag sin">Sin landing</span>{% endif %}</td>
+              <td class="fijo"><span class="estado {% if p.publicado %}pub{% else %}bor{% endif %}">{% if p.publicado %}Publicado{% else %}Borrador{% endif %}</span></td>
+              <td class="fijo">{{ p.fecha_publicacion|date:"d/m/Y"|default:"—" }}</td>
+              <td class="fijo">{{ p.autor.get_username|default:"—" }}</td>
+              <td class="fijo">
+                <div class="acciones">
+                  {% if p.get_absolute_url %}<a class="btn oscuro" href="{{ p.get_absolute_url }}" target="_blank" rel="noopener">Ver</a>{% endif %}
+                  <a class="btn" href="{% url 'panel_blog_editar' p.pk %}">Editar</a>
+                  <form method="post" action="{% url 'panel_blog_eliminar' p.pk %}" onsubmit="return confirm('¿Eliminar «{{ p.titulo|escapejs }}»? No se puede deshacer.');">
+                    {% csrf_token %}<button class="btn peligro" type="submit">Eliminar</button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p class="vacio">Aún no hay artículos. Crea el primero con «Nuevo artículo».</p>
+    {% endif %}
+  </div>
+{% endblock %}

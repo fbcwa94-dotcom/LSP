@@ -21,11 +21,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ---------------------------------------------------------------------------
 # Modo (desarrollo / producción)
 # ---------------------------------------------------------------------------
-DEBUG = os.environ.get("DJANGO_DEBUG", "1") == "1"
+DEBUG = True
 
 if DEBUG:
     SECRET_KEY = "django-insecure-solo-para-desarrollo"
-    ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+    ALLOWED_HOSTS = ["localhost", "127.0.0.1", ""]
 else:
     # En producción NO hay valor por defecto: si falta, el servidor no arranca.
     try:
@@ -137,6 +137,8 @@ USE_TZ = True
 STATIC_URL = "static/"
 STATICFILES_DIRS = [BASE_DIR / "app" / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"   # destino de `python manage.py collectstatic`
+MEDIA_URL = "media/"
+MEDIA_ROOT = BASE_DIR / "media" 
 
 
 # ---------------------------------------------------------------------------

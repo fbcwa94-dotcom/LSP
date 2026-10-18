@@ -21,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ---------------------------------------------------------------------------
 # Modo (desarrollo / producción)
 # ---------------------------------------------------------------------------
-DEBUG = False
+DEBUG = True
 
 if DEBUG:
     SECRET_KEY = "django-insecure-solo-para-desarrollo"

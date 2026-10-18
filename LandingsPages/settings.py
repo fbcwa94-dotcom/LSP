@@ -21,11 +21,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ---------------------------------------------------------------------------
 # Modo (desarrollo / producción)
 # ---------------------------------------------------------------------------
-DEBUG = True
+DEBUG = False
 
 if DEBUG:
     SECRET_KEY = "django-insecure-solo-para-desarrollo"
-    ALLOWED_HOSTS = ["localhost", "127.0.0.1", ""]
+    ALLOWED_HOSTS = ["localhost", "127.0.0.1", "*"]
 else:
     # En producción NO hay valor por defecto: si falta, el servidor no arranca.
     try:
